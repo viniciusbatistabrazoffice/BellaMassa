@@ -10,13 +10,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.backend.controller.AuthController;
 import com.backend.controller.UserController;
+import com.backend.dto.ErrorResponse;
 
-@RestControllerAdvice(assignableTypes = UserController.class)
+@RestControllerAdvice(assignableTypes = { UserController.class, AuthController.class })
 public class ApiExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> notFound(UserNotFoundException exception) {
         return error(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> invalidCredentials(InvalidCredentialsException exception) {
+        return error(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", exception.getMessage());
+    }
+
+    @ExceptionHandler(InactiveUserException.class)
+    public ResponseEntity<ErrorResponse> inactiveUser(InactiveUserException exception) {
+        return error(HttpStatus.FORBIDDEN, "USER_INACTIVE", exception.getMessage());
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
@@ -48,12 +60,6 @@ public class ApiExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> error(HttpStatus status, String code, String message) {
-        return ResponseEntity.status(status).body(new ErrorResponse(new ErrorDetail(code, message)));
-    }
-
-    public record ErrorResponse(ErrorDetail error) {
-    }
-
-    public record ErrorDetail(String code, String message) {
+        return ResponseEntity.status(status).body(ErrorResponse.of(code, message));
     }
 }

@@ -1,5 +1,6 @@
 package com.backend.entity;
 
+
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,6 +14,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+
+
 
 @Entity
 @Table(name = "users")
@@ -119,6 +122,10 @@ public class User {
 
     public Instant getLastAccess() {
         return lastAccess;
+    }
+
+    public void setLastAccess(Instant lastAccess) {
+        this.lastAccess = lastAccess;
     }
 
     @PrePersist
